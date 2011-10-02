@@ -40,7 +40,7 @@ module Gretel
       link_options = case options[:semantics].to_sym
         when :microdata; {
           :itemprop => 'title url',
-          :itemscope => true,
+          :itemscope => '',
           :itemtype => 'http://data-vocabulary.org/Breadcrumb'
         }
         else {}
