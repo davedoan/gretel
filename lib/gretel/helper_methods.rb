@@ -37,33 +37,29 @@ module Gretel
       link_last = options[:link_last]
       options[:link_last] = true
       separator = (options[:separator] || "&gt;").html_safe
-      link_options = case options[:semantics].to_sym
-        when :microdata; {
-          :itemprop => 'title url',
-          :itemscope => '',
-          :itemtype => 'http://data-vocabulary.org/Breadcrumb'
-        }
-        else {}
-      end
+      link_options = options[:semantic] ? {
+        :itemprop => 'title url'
+      } : {}
 
       name, object = args[0], args[1]
       
       crumb = Crumbs.get_crumb(name, object)
-      out = link_to_if(link_last, crumb.link.text, crumb.link.url, crumb.link.options.reverse_merge(link_options))
+      out = [link_to_if(link_last, crumb.link.text, crumb.link.url, crumb.link.options.reverse_merge(link_options))]
       
       while parent = crumb.parent
         last_parent = parent.name
         crumb = Crumbs.get_crumb(parent.name, parent.object)
-        out = link_to(crumb.link.text, crumb.link.url, crumb.link.options.reverse_merge(link_options)) + " " + separator + " " + out
+        out.unshift(link_to(crumb.link.text, crumb.link.url, crumb.link.options.reverse_merge(link_options)))
       end
       
       # TODO: Refactor this
       if options[:autoroot] && name != :root && last_parent != :root
         crumb = Crumbs.get_crumb(:root)
-        out = link_to(crumb.link.text, crumb.link.url, crumb.link.options.reverse_merge(link_options)) + " " + separator + " " + out
+        out.unshift(link_to(crumb.link.text, crumb.link.url, crumb.link.options.reverse_merge(link_options)))
       end
       
-      out
+      out = out.map { |link| %Q{<span itemscope itemtype="http://data-vocabulary.org/Breadcrumb">#{link}</span>} } if options[:semantic]
+      out.join(" #{separator} ").html_safe
     end
   end
 end
