@@ -1,3 +1,5 @@
+$:.push File.expand_path("../lib", __FILE__)
+
 Gem::Specification.new do |s|
   s.name = "gretel"
   s.version = "1.0.4"
@@ -8,6 +10,6 @@ Gem::Specification.new do |s|
   s.summary = "Flexible Ruby on Rails breadcrumbs plugin."
   s.homepage = "http://github.com/lassebunk/gretel"
   
-  s.files = Dir['lib/**/*.rb']
+  s.files = `git ls-files`.split
   s.require_paths = ["lib"]
 end
